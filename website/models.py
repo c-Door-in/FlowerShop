@@ -9,77 +9,65 @@ class Event(models.Model):
     """Модель сущности Событие"""
     name = models.CharField(max_length=128, verbose_name='Наименование события')
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         verbose_name = 'Событие'
         verbose_name_plural = 'События'
 
 
-class Flower(models.Model):
-    """Модель сущности Цветок"""
-    name = models.CharField(max_length=128, verbose_name='Наименование цветка')
-    flower_color = models.CharField(max_length=128, blank=True, verbose_name='Цвет цветка')
-    price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name='Цена', validators=[MinValueValidator(0)])
-
-    class Meta:
-        verbose_name = 'Цветок'
-        verbose_name_plural = 'Цветы'
-
-
-class Decoration(models.Model):
-    """Модель сущности Украшение букета"""
-    name = models.CharField(max_length=128, verbose_name='Наименование украшения')
-    price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name='Цена', validators=[MinValueValidator(0)])
-
-    class Meta:
-        verbose_name = 'Украшение'
-        verbose_name_plural = 'Украшения'
-
-
 class Bouquet(models.Model):
     """Модель сущности Букет"""
-    flowers = models.ManyToManyField(Flower, related_name='bouquets', through='FlowerItem', verbose_name='Цветы')
-    decorations = models.ManyToManyField(Decoration,
-                                         related_name='bouquets',
-                                         through='DecorationItem',
-                                         verbose_name='Украшения'
-                                         )
+    name = models.CharField(max_length=128, default='Букет', verbose_name='Наименование')
     price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name='Цена', validators=[MinValueValidator(0)])
     event = models.ForeignKey(Event,
                               related_name='bouquets',
                               null=True,
+                              blank=True,
                               on_delete=models.SET_NULL,
                               verbose_name='Событие'
                               )
     image = models.ImageField(upload_to='bouquets', verbose_name='Изображение')
     description = models.TextField(verbose_name='Описание')
+    composition = models.TextField(default='Состав:', verbose_name='Состав')
+    size = models.TextField(default='Ширина: Высота:', verbose_name='Размер')
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = 'Букет'
         verbose_name_plural = 'Букеты'
 
 
-class FlowerItem(models.Model):
-    bouquet = models.ForeignKey(Bouquet, on_delete=models.CASCADE, verbose_name='Букет')
-    flower = models.ForeignKey(Flower, on_delete=models.CASCADE, verbose_name='Цветок')
-    quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
-
-
-class DecorationItem(models.Model):
-    bouquet = models.ForeignKey(Bouquet, on_delete=models.CASCADE, verbose_name='Букет')
-    decoration = models.ForeignKey(Decoration, on_delete=models.CASCADE, verbose_name='Украшение')
-    quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
-
-
 class Order(models.Model):
     """Модель сущности Заказ"""
+    ACCEPT = 'AC'
+    ASSEMBLY = 'AS'
+    DELIVERY = 'DL'
+    FINISH = 'FN'
+
+    STATUS_ORDER_CHOICES = [
+        (ACCEPT, 'Принят'),
+        (ASSEMBLY, 'Сборка'),
+        (DELIVERY, 'Доставка'),
+        (FINISH, 'Завершен')
+    ]
+
     bouquet = models.ForeignKey(Bouquet, on_delete=models.CASCADE, related_name='orders', verbose_name='Букет')
     client_name = models.CharField(max_length=128, verbose_name='Имя клиента')
     address = models.TextField(verbose_name='Адрес')
     phonenumber = PhoneNumberField(verbose_name='Телефон')
     delivery_time = models.TimeField(verbose_name='Время доставки', db_index=True)
+    order_status = models.CharField(max_length=2, choices=STATUS_ORDER_CHOICES,
+                                    default=ACCEPT, verbose_name='Статус заказа', db_index=True)
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
+
+    def __str__(self):
+        return f'{self.pk} - {self.bouquet}'
 
     class Meta:
         ordering = ['-created_at']
@@ -89,6 +77,16 @@ class Order(models.Model):
 
 class CallBack(models.Model):
     """Модель сущности Обратный звонок"""
+    NEW = 'NW'
+    CALLED = 'CD'
+    FINISH = 'FN'
+
+    STATUS_CHOICES = [
+        (NEW, 'Новый'),
+        (CALLED, 'Совершен звонок'),
+        (FINISH, 'Завершен')
+    ]
+
     florist = models.ForeignKey(User,
                                 on_delete=models.SET_NULL,
                                 null=True,
@@ -96,8 +94,13 @@ class CallBack(models.Model):
                                 verbose_name='Флорист')
     client_name = models.CharField(max_length=128, verbose_name='Имя клиента')
     phonenumber = PhoneNumberField(verbose_name='Телефон')
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES,
+                              default=NEW, verbose_name='Статус', db_index=True)
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
+
+    def __str__(self):
+        return f'{self.client_name} - {self.phonenumber}'
 
     class Meta:
         ordering = ['-created_at']
@@ -107,6 +110,15 @@ class CallBack(models.Model):
 
 class Delivery(models.Model):
     """Модель сущности Доставка"""
+    NEW = 'NW'
+    PROCESSING = 'PR'
+    FINISH = 'FN'
+
+    STATUS_CHOICES = [
+        (NEW, 'Новая доставка'),
+        (PROCESSING, 'Доставляется'),
+        (FINISH, 'Завершена доставка')
+    ]
     order = models.ForeignKey(Order,
                               on_delete=models.CASCADE,
                               related_name='deliveries',
@@ -118,8 +130,13 @@ class Delivery(models.Model):
                                 related_name='deliveries',
                                 verbose_name='Курьер'
                                 )
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES,
+                              default=NEW, verbose_name='Статус', db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создана')
-    delivered_at = models.DateTimeField(verbose_name='Время доставки', db_index=True)
+    delivered_at = models.DateTimeField(blank=True, null=True, verbose_name='Фактическое время доставки', db_index=True)
+
+    def __str__(self):
+        return f'{self.order} - {self.courier}'
 
     class Meta:
         ordering = ['-created_at']

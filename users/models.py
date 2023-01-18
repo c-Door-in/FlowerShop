@@ -19,3 +19,5 @@ class User(AbstractUser):
                             default=R_NOT_DEFINED,
                             verbose_name='Роль персонала'
                             )
+    tg_chat_id = models.CharField(max_length=64, null=True, verbose_name='ID чата Телеграм')
+    is_worked = models.BooleanField(default=True, verbose_name='Выход на работу')
