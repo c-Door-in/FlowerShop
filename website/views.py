@@ -45,12 +45,17 @@ def result(request):
 
 
 def consultation_form(request):
-    bot_api_key = settings.BOT_API_KEY
-    bot = Bot(token=bot_api_key)
     user_name = request.POST.get('fname')
     user_phone = request.POST.get('tel')
-    florist_chat_id = settings.FORIST_CHAT_ID
-    bot.send_message(text=f'{user_name}, {user_phone}', chat_id=florist_chat_id)
+    
+    bot_api_key = settings.BOT_API_KEY
+    if bot_api_key:
+        bot = Bot(token=bot_api_key)
+        florist_chat_id = settings.FORIST_CHAT_ID
+        if florist_chat_id:
+            bot.send_message(text=f'{user_name}, {user_phone}', chat_id=florist_chat_id)
+    
+    
     print(user_name, user_phone)
     return render(request, 'consult_confirm.html')
     
