@@ -39,3 +39,11 @@ def quiz_step(request):
 
 def result(request):
     return render(request, 'result.html')
+
+
+def consultation_form(request):
+    user_name = request.POST.get('fname')
+    user_phone = request.POST.get('tel')
+    print(user_name, user_phone)
+    return render(request, 'consult_confirm.html')
+    
