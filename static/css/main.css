@@ -26,6 +26,9 @@ input::placeholder {
 	color: rgba(0, 0, 0, .3);
 }
 
+input[type=radio] {
+  display: none;
+}
 
 .container {
 	max-width: 1215px;
@@ -427,6 +430,18 @@ margin-bottom: 30px;
 	line-height: 103.52%;
 	color: #2D2D2D;
 }
+
+.quiz__options {
+	margin-top: 20px;
+	margin-bottom: 38px;
+	font-family: 'Unbounded';
+	font-style: normal;
+	font-weight: 700;
+	font-size: 26px;
+	line-height: 103.52%;
+	color: #7a7a7a;
+}
+
 .quiz__elem {
 	font-weight: 500;
 	font-size: 16px;

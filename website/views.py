@@ -3,6 +3,8 @@ from telegram import Bot
 from django.conf import settings
 from django.shortcuts import render
 
+from website.models import Event
+
 
 def mainpage(request):
     return render(request, 'index.html')
@@ -33,7 +35,16 @@ def order_step(request):
 
 
 def quiz(request):
-    return render(request, 'quiz.html')
+
+    print(request.POST.get('userResponses'))
+
+    events = Event.objects.all()
+
+    context = {
+        'events': events,
+    }
+
+    return render(request, 'quiz.html', context)
 
 
 def quiz_step(request):
