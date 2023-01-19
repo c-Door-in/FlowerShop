@@ -2,33 +2,186 @@
 {% load static %}
 
 {% block content %}
-<section id="quiz">
-	<div class="container">
-		<div class="quiz">
-			<div class="quiz__back ">
-				<a href="#" class="quiz__back_link fic"><img src="{% static 'img/arrow-left.svg' %}" alt="arrow-left" class="arrowLeft">
-				<span class="quiz__back_intro">Назад</span></a>
-			</div>
-			<div class="quiz__block">
-				<h1 class="quiz__title">К какому событию нужен букет?</h1>
-				<div class="quiz__elems fic">
-					<button class="quiz__elem">Свадьба</button>
-					<button class="quiz__elem">День рождения</button>
-					<button class="quiz__elem">Без повода</button>
-				</div>
-				<div class="quiz__progress">
-					<div class="quiz__progress_step">
-						<span class="quiz__progress_num">1</span>
-						<span class="quiz__progress_in"> шаг из </span>
-						<span class="quiz__progress_num">2</span>
+
+{% verbatim %}
+<article id="VueApp">
+		<section v-for="(question, index) in quiz.questions">
+			<div class="container">
+				<div class="quiz">
+					<div>
+						{% endverbatim %}
+						{% for event in events_norm %}
+							{{ event }}
+						{% endfor %}
+						{% verbatim %}
 					</div>
-					<div class="quiz__progress_line">
-						<div class="quiz__progress_lineActive"></div>
+					<form class="d-none">
+						<div v-show="index === Index">
+							<div class="quiz__back ">
+								<a href="#" class="quiz__back_link fic" v-if="index > 0" v-on:click="Prev">{% endverbatim %}<img src="{% static 'img/arrow-left.svg' %}" alt="arrow-left" class="arrowLeft">{% verbatim%}
+								<span class="quiz__back_intro">Назад</span></a>
+							</div>
+
+							<h1 class="quiz__title">{{ question.Question }}</h1>
+
+							<div class="quiz__elems fic">
+
+
+									<label v-for="button in question.Buttons" class="quiz__elem">
+										<input type="radio"
+											   v-on:click="Next"
+											   v-bind:value="button.text"
+											   v-bind:name="index"
+											   v-model="userResponses[index]"> {{button.text}}
+									</label>
+
+
+							</div>
+							<div class="quiz__progress">
+								<div class="quiz__progress_step">
+									<span class="quiz__progress_num">{{ index+1 }}</span>
+									<span class="quiz__progress_in"> шаг из </span>
+									<span class="quiz__progress_num">{{ Steps }}</span>
+								</div>
+								<div class="quiz__progress_line">
+									<div class="quiz__progress_lineActive" style="width: 30%"></div>
+								</div>
+							</div>
+
+						</div>
+					</form>
+				</div>
+			</div>
+		</section>
+
+		<section v-show="Index === quiz.questions.length">
+			<div class="container">
+				<div class="quiz">
+					<div class="quiz__back ">
+						<a href="#" class="quiz__back_link fic" v-on:click="Prev">{% endverbatim %}<img src="{% static 'img/arrow-left.svg' %}" alt="arrow-left" class="arrowLeft">{% verbatim %}
+						<span class="quiz__back_intro">Назад</span></a>
+					</div>
+					<h1 class="quiz__title">Вы Выбрали</h1>
+					<div class="quiz__elems fic">
+						<h1 class="quiz__options">Событие: {{userResponses[0]}}</h1>
+					</div>
+					<div class="quiz__elems fic">
+						<h1 class="quiz__options">Бюджет: {{userResponses[1]}}</h1>
+					</div>
+					<div class="quiz__progress">
+						<div class="quiz__progress_step">
+							<span class="quiz__progress_num">{{ Index+1 }}</span>
+							<span class="quiz__progress_in"> шаг из </span>
+							<span class="quiz__progress_num">{{ Steps }}</span>
+						</div>
+						<div class="quiz__progress_line">
+							<div class="quiz__progress_lineActive" style="width: 100%"></div>
+						</div>
+					</div>
+					<div class="container">
+						<form class="order__form">
+							<input v-model="userResponses" type="hidden" value="userResponses" name="userResponses">
+							{% endverbatim %}
+							<button type="submit" formmethod="post" ref="HiddenFormSubmit" formaction="{% url 'quiz' %}" class="btn order__form_btn">Подобрать букет</button>
+							{% csrf_token %}
+							{% verbatim %}
+						</form>
 					</div>
 				</div>
 			</div>
-			
-		</div>
-	</div>
-</section>
-{% endblock %}
+		</section>
+	</article>
+
+
+<script>
+
+	Vue.createApp({
+    name: "App",
+    components: {
+        VForm: VeeValidate.Form,
+        VField: VeeValidate.Field,
+        ErrorMessage: VeeValidate.ErrorMessage,
+    },
+    data() {
+        return {
+
+            DATA: {
+
+            },
+			IDs: {
+
+			},
+            Costs: {
+
+            },
+
+            Designed: false,
+            Designed1: true,
+
+            Index: 0,
+
+
+
+
+            quiz: {
+            	questions: [
+            		{
+            			Question: "К какому событию нужен букет?",
+            			Buttons: [
+            				{text: "Свадьба", value: "wedding"},
+            				{text: "День рождения", value: "birthday"},
+            				{text: "Без повода", value: "None"},
+            			]
+            		},
+					{
+						Question: "На какой бюджет рассчитываете?",
+
+            			Buttons: [
+            			{% endverbatim %}
+            			{% for event in events %}
+            				{% verbatim %}{text: "{% endverbatim %}{{ event.name }}{% verbatim %}", value: {% endverbatim %}{{ event.pk }}{% verbatim %}},{% endverbatim %}
+            			{% endfor %}]
+						{% verbatim %}
+					}
+            	]
+            },
+
+			Steps: 3,
+            userResponses: ["",""]
+
+        }
+    },
+    methods: {
+        ToStep4() {
+
+            this.Designed = true
+            setTimeout(() => this.$refs.ToStep4.click(), 0);
+            //this.Designed1 = false
+        },
+        Next() {
+        	this.Index++
+        },
+        Prev() {
+        	this.Index--
+        },
+        Progress(value) {
+        	return value*100/Steps
+        },
+
+        makeRequest() {
+        	return this.userResponses
+        }
+
+    },
+    computed: {
+        Cost() {
+            return 0
+        }
+    },
+
+
+	}).mount('#VueApp')
+
+</script>
+{% endverbatim %}
+{% endblock content %}
