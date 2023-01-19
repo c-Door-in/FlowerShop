@@ -1,9 +1,11 @@
+from django.db.models import Q
+from django.utils.datastructures import MultiValueDictKeyError
 from telegram import Bot
 
 from django.conf import settings
 from django.shortcuts import render
 
-from website.models import Event
+from website.models import Event, Bouquet
 
 
 def mainpage(request):
@@ -27,6 +29,18 @@ def card(request):
 
 
 def order(request):
+
+    try:
+        bouquet_id = request.GET['BouquetOrder']
+        bouquet = Bouquet.objects.get(pk=bouquet_id)
+        print(bouquet)
+        context = {
+            'bouquet': bouquet
+        }
+        return render(request, 'order.html', context)
+    except MultiValueDictKeyError:
+        pass
+
     return render(request, 'order.html')
 
 
@@ -36,7 +50,25 @@ def order_step(request):
 
 def quiz(request):
 
-    print(request.POST.get('userResponses'))
+    if request.method == 'POST':
+        post_params = request.POST.get('userResponses').split(',')
+        print(post_params)
+        if post_params[1] == 1:
+            query = Q(event__name=post_params[0]) & Q(price_lt=1000)
+        elif post_params[1] == 2:
+            query = Q(event__name=post_params[0]) & Q(price_gte=1000) & Q(price_lte=5000)
+        elif post_params[1] == 3:
+            query = Q(event__name=post_params[0]) & Q(price_gt=5000)
+        else:
+            query = Q(event__name=post_params[0])
+
+        bouquets = Bouquet.objects.filter(query)
+
+        context = {
+            'bouquets': bouquets
+        }
+
+        return render(request, 'result.html', context)
 
     events = Event.objects.all()
 

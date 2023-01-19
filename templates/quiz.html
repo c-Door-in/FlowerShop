@@ -128,20 +128,22 @@
             		{
             			Question: "К какому событию нужен букет?",
             			Buttons: [
-            				{text: "Свадьба", value: "wedding"},
-            				{text: "День рождения", value: "birthday"},
-            				{text: "Без повода", value: "None"},
-            			]
+            				{% endverbatim %}
+							{% for event in events %}
+								{% verbatim %}{text: "{% endverbatim %}{{ event.name }}{% verbatim %}", value: {% endverbatim %}{{ event.pk }}{% verbatim %}},{% endverbatim %}
+							{% endfor %}]
+							{% verbatim %}
             		},
 					{
 						Question: "На какой бюджет рассчитываете?",
 
             			Buttons: [
-            			{% endverbatim %}
-            			{% for event in events %}
-            				{% verbatim %}{text: "{% endverbatim %}{{ event.name }}{% verbatim %}", value: {% endverbatim %}{{ event.pk }}{% verbatim %}},{% endverbatim %}
-            			{% endfor %}]
-						{% verbatim %}
+            				{text: "До 1000 Руб.", value: "1"},
+            				{text: "1000-5000 Руб.", value: "2"},
+            				{text: "Свыше 5000 Руб.", value: "3"},
+            				{text: "Не имеет значения", value: "4"},
+            			]
+
 					}
             	]
             },
