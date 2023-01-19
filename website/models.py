@@ -55,11 +55,33 @@ class Order(models.Model):
         (FINISH, 'Завершен')
     ]
 
+    QUICLY = 'QLY'
+    FIRST_PERIOD = 'FRS'
+    SECOND_PERIOD = 'SEC'
+    THIRD_PERIOD = 'THR'
+    FOURTH_PERIOD = 'FOU'
+    FIFTH_PERIOD = 'FIF'
+
+    DELIVERY_PERIOD_CHOICES = [
+        (QUICLY, 'Как можно скорее'),
+        (FIRST_PERIOD, 'с 10:00 до 12:00'),
+        (SECOND_PERIOD, 'с 12:00 до 14:00'),
+        (THIRD_PERIOD, 'с 14:00 до 16:00'),
+        (FOURTH_PERIOD, 'с 16:00 до 18:00'),
+        (FIFTH_PERIOD, 'с 18:00 до 20:00')
+    ]
+
     bouquet = models.ForeignKey(Bouquet, on_delete=models.CASCADE, related_name='orders', verbose_name='Букет')
     client_name = models.CharField(max_length=128, verbose_name='Имя клиента')
     address = models.TextField(verbose_name='Адрес')
     phonenumber = PhoneNumberField(verbose_name='Телефон')
-    delivery_time = models.TimeField(verbose_name='Время доставки', db_index=True)
+    delivery_time = models.CharField(
+        max_length=3,
+        choices=DELIVERY_PERIOD_CHOICES,
+        default=QUICLY,
+        verbose_name='Время доставки',
+        db_index=True
+    )
     order_status = models.CharField(max_length=2, choices=STATUS_ORDER_CHOICES,
                                     default=ACCEPT, verbose_name='Статус заказа', db_index=True)
 
