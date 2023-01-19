@@ -5,7 +5,7 @@ from telegram import Bot
 from django.conf import settings
 from django.shortcuts import render
 
-from website.models import Event, Bouquet
+from website.models import Event, Bouquet, Order
 
 
 def mainpage(request):
@@ -45,6 +45,22 @@ def order(request):
 
 
 def order_step(request):
+
+    print(request.GET)
+    raw_order = request.GET
+
+    print(raw_order['BouquetId'])
+
+
+    #new_order = Order.objects.create(
+    #    bouquet=Bouquet.objects.get(pk=raw_order['BouquetId']),
+    #    client_name=raw_order['fname'],
+    #    address=raw_order['adres'],
+    #    phonenumber=raw_order['tel'],
+    #    delivery_time=,
+    #    order_status='Принят',
+    #)
+
     return render(request, 'order-step.html')
 
 
