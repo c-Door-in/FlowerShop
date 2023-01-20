@@ -5,6 +5,7 @@ from telegram import Bot
 from django.conf import settings
 from django.shortcuts import render
 
+from website.forms import OrderForm
 from website.models import Event, Bouquet, Order
 
 
@@ -33,9 +34,12 @@ def order(request):
     try:
         bouquet_id = request.GET['BouquetOrder']
         bouquet = Bouquet.objects.get(pk=bouquet_id)
-        print(bouquet)
+
+        order_form = OrderForm(initial={'bouquet': bouquet})
+
         context = {
-            'bouquet': bouquet
+            'bouquet': bouquet,
+            'order_form': order_form,
         }
         return render(request, 'order.html', context)
     except MultiValueDictKeyError:
@@ -45,21 +49,22 @@ def order(request):
 
 
 def order_step(request):
+    if request.method == 'POST':
+        order_form = OrderForm(request.POST)
 
-    print(request.GET)
-    raw_order = request.GET
-
-    print(raw_order['BouquetId'])
-
-
-    #new_order = Order.objects.create(
-    #    bouquet=Bouquet.objects.get(pk=raw_order['BouquetId']),
-    #    client_name=raw_order['fname'],
-    #    address=raw_order['adres'],
-    #    phonenumber=raw_order['tel'],
-    #    delivery_time=,
-    #    order_status='Принят',
-    #)
+        if order_form.is_valid():
+            form = order_form.save(commit=False)
+            bouquet_id = form.bouquet
+            form.save()
+            context = {
+                'bouquet_id': bouquet_id.pk
+            }
+            return render(request, 'order-step.html', context)
+        else:
+            context = {
+                'order_form': order_form,
+            }
+            return render(request, 'order.html', context)
 
     return render(request, 'order-step.html')
 
@@ -68,7 +73,6 @@ def quiz(request):
 
     if request.method == 'POST':
         post_params = request.POST.get('userResponses').split(',')
-        print(post_params)
         if post_params[1] == 1:
             query = Q(event__name=post_params[0]) & Q(price_lt=1000)
         elif post_params[1] == 2:
