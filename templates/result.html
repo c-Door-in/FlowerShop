@@ -6,48 +6,56 @@
 	<div class="container">
 		<div class="result p100">
 			<div class="title">Мы подобрали специально для Вас</div>
-			{% for bouquet in bouquets%}
-			<div class="result__block ficb">
-				<div class="result__elems">
-					<div class="card__elems ">
-						<span class="card__elems_intro">Описание:</span>
-						<div class="card__items">
-							<p class="card__items_text card__items_text__first">
-								{{ bouquet.description }}
-							</p>
+			{% if not bouquets %}
+				<h1 class="title">К сожалению по вашему запросу нет подходящих букетов</h1>
+			{% else %}
+				{% for bouquet in bouquets %}
+				<div class="result__block ficb p20">
+					<div class="result__elems">
+						<div class="card__elems ">
+							<span class="card__elems_intro">Описание:</span>
+							<div class="card__items">
+								<p class="card__items_text card__items_text__first">
+									{{ bouquet.description }}
+								</p>
+							</div>
+						</div>
+						<div class="card__elems ">
+							<span class="card__elems_intro">Состав:</span>
+							<div class="card__items">
+								<p class="card__items_text card__items_text__first">
+									{{ bouquet.composition }}
+								</p>
+
+							</div>
 						</div>
 					</div>
-					<div class="card__elems ">
-						<span class="card__elems_intro">Состав:</span>
-						<div class="card__items">
-							<p class="card__items_text card__items_text__first">
-								{{ bouquet.composition }}
-							</p>
-							
+					<img src="{{ bouquet.image.url }}" alt="result Img" class="result__block_img">
+					<div class="result__items">
+						<div class="title result__items_title">{{ bouquet.name }}</div>
+						<div class="result__items_price">{{ bouquet.price }} руб</div>
+						<form action="{% url 'order' %}">
+							<input type="hidden" value="{{ bouquet.pk }}" name="BouquetOrder">
+							<button class="btn result__items_btn" type="submit">Заказать букет</button>
+						</form>
+						<hr class="result__items_line" />
+						<div class="result__items_intro">Хотите что-то более специальное?</div>
+						<div class="result__items_block">
+							<div class="p10">
+								<a href="{% url 'catalog' %}" class="result__items_block__btn">
+									<button class="btn largeBtn result__items_block__btn">Смотреть всю коллекцию</button>
+								</a>
+							</div>
+							<div class="p10">
+								<a href="{% url 'consultation' %}" class="result__items_block__btn">
+									<button class="btn largeBtn result__items_block__btn">Заказать консультацию</button>
+								</a>
+							</div>
 						</div>
 					</div>
 				</div>
-				<img src="{{ bouquet.image.url }}" alt="result Img" class="result__block_img">
-				<div class="result__items">
-					<div class="title result__items_title">{{ bouquet.name }}</div>
-					<div class="result__items_price">{{ bouquet.price }} руб</div>
-					<form action="{% url 'order' %}">
-						<input type="hidden" value="{{ bouquet.pk }}" name="BouquetOrder">
-						<button class="btn result__items_btn" type="submit">Заказать букет</button>
-					</form>
-					<hr class="result__items_line" />
-					<div class="result__items_intro">Хотите что-то более специальное?</div>
-					<div class="result__items_block">
-						<a href="{% url 'catalog' %}">
-							<button class="btn largeBtn result__items_block__btn">Смотреть всю коллекцию</button>
-						</a>
-						<a href="{% url 'consultation' %}">
-							<button class="btn largeBtn result__items_block__btn">Заказать консультацию</button>
-						</a>
-					</div>
-				</div>
-			</div>
-			{% endfor %}
+				{% endfor %}
+			{% endif %}
 		</div>
 	</div>
 </section>
