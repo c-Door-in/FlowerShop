@@ -1,9 +1,10 @@
 from django.db.models import Q
+from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from telegram import Bot
 
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from website.forms import OrderForm
 from website.models import Event, Bouquet, Order
@@ -30,22 +31,25 @@ def card(request):
 
 
 def order(request):
+    if request.method == 'POST':
+        order_form = OrderForm(request.POST)
 
-    try:
-        bouquet_id = request.GET['BouquetOrder']
-        bouquet = Bouquet.objects.get(pk=bouquet_id)
+        if order_form.is_valid():
+            form = order_form.save(commit=False)
+            form.save()
 
-        order_form = OrderForm(initial={'bouquet': bouquet})
+            return reverse('order_step', kwargs={'pk': form.pk})
 
-        context = {
-            'bouquet': bouquet,
-            'order_form': order_form,
-        }
-        return render(request, 'order.html', context)
-    except MultiValueDictKeyError:
-        pass
+    bouquet_id = request.GET.get('BouquetOrder')
+    bouquet = get_object_or_404(Bouquet, pk=bouquet_id)
 
-    return render(request, 'order.html')
+    order_form = OrderForm(initial={'bouquet': bouquet})
+
+    context = {
+        'bouquet': bouquet,
+        'order_form': order_form,
+    }
+    return render(request, 'order.html', context)
 
 
 def order_step(request):
@@ -70,7 +74,6 @@ def order_step(request):
 
 
 def quiz(request):
-
     if request.method == 'POST':
         post_params = request.POST.get('userResponses').split(',')
         if post_params[1] == 1:
@@ -110,15 +113,13 @@ def result(request):
 def consultation_form(request):
     user_name = request.POST.get('fname')
     user_phone = request.POST.get('tel')
-    
+
     bot_api_key = settings.BOT_API_KEY
     if bot_api_key:
         bot = Bot(token=bot_api_key)
         florist_chat_id = settings.FORIST_CHAT_ID
         if florist_chat_id:
             bot.send_message(text=f'{user_name}, {user_phone}', chat_id=florist_chat_id)
-    
-    
+
     print(user_name, user_phone)
     return render(request, 'consult_confirm.html')
-    
