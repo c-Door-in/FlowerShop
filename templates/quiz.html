@@ -68,6 +68,15 @@
 					<div class="quiz__elems fic">
 						<h1 class="quiz__options">Бюджет: {{userResponses[1]}}</h1>
 					</div>
+					<div class="quiz__elems fic">
+						<form class="order__form">
+							<input v-model="userResponses" type="hidden" value="userResponses" name="userResponses">
+							{% endverbatim %}
+							<button type="submit" formmethod="post" ref="HiddenFormSubmit" formaction="{% url 'quiz' %}" class="btn order__form_btn">Подобрать букет</button>
+							{% csrf_token %}
+							{% verbatim %}
+						</form>
+					</div>
 					<div class="quiz__progress">
 						<div class="quiz__progress_step">
 							<span class="quiz__progress_num">{{ Index+1 }}</span>
@@ -78,15 +87,7 @@
 							<div class="quiz__progress_lineActive" style="width: 100%"></div>
 						</div>
 					</div>
-					<div class="container">
-						<form class="order__form">
-							<input v-model="userResponses" type="hidden" value="userResponses" name="userResponses">
-							{% endverbatim %}
-							<button type="submit" formmethod="post" ref="HiddenFormSubmit" formaction="{% url 'quiz' %}" class="btn order__form_btn">Подобрать букет</button>
-							{% csrf_token %}
-							{% verbatim %}
-						</form>
-					</div>
+
 				</div>
 			</div>
 		</section>
@@ -187,3 +188,6 @@
 </script>
 {% endverbatim %}
 {% endblock content %}
+
+{% block footer %}
+{% endblock footer %}

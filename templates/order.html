@@ -8,12 +8,27 @@
 			<div class="order__block">
 				<div class="order_items">
 					<div class="title">Оформление доставки</div>
-					<form action="{% url 'order_step' %}" class="order__form">
+					<form action="{% url 'order_step' %}" class="order__form" method="post">
+						{% csrf_token %}
+						{{ order_form.errors }}
 						<div class="order__form_block ficb">
-							<input type="text" name="fname" class="order__form_input" placeholder="Введите Имя" required>
-							<input type="text" name="tel" class="order__form_input" placeholder="+ 7 (999) 000 00 00" required>
-							<input type="text" name="adres" class="order__form_input" placeholder="Адрес доставки" required>
+							{{ order_form.client_name }}
+							{{ order_form.phonenumber}}
+							{{ order_form.address}}
+							{{ order_form.bouquet}}
+							{{ order_form.order_status}}
 						</div>
+						<div class="order__form_btns fic">
+							{% for field in order_form.delivery_time %}
+								<div class="order__form_radioBlock ">
+									{{ field.tag }}
+									<label for="{{ field.id_for_label }}" class="radioLable">
+									{{ field.choice_label }}
+									</label>
+								</div>
+							{% endfor %}
+						</div>
+						<!--
 						<div class="order__form_btns fic">
 							<div class="order__form_radioBlock ">
 								<input type="radio" name="orderTime" id="radio1" value="Как можно скорее" class="order__form_radio" />
@@ -39,8 +54,9 @@
 								<input type="radio" name="orderTime" id="radio6" value="с 18:00 до 20:00" class="order__form_radio" />
 								<label for="radio6" class="radioLable">с 18:00 до 20:00</label>
 							</div>
-							
+
 						</div>
+						-->
 						<input type="hidden" value="{{ bouquet.pk }}" name="BouquetId">
 						<div class="order__form_line"></div>
 						<div class="order__form_btns ficb">
@@ -49,7 +65,7 @@
 						</div>
 					</form>
 				</div>
-				
+
 			</div>
 		</div>
 	</div>
