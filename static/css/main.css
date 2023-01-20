@@ -756,3 +756,20 @@ color: #2D2D2D;
 
 opacity: 0.3;
 }
+
+.error_message {
+	font-size: 14px;
+
+	color: red;
+}
+
+.validation{
+    color: #D63301;
+    background-color: #FFCCBA;
+    background-image: url('https://i.imgur.com/GnyDvKN.png');
+}
+
+.error-msg {
+  color: #D8000C;
+  background-color: #FFBABA;
+}
