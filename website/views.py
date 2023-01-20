@@ -76,13 +76,14 @@ def order_step(request):
 def quiz(request):
     if request.method == 'POST':
         post_params = request.POST.get('userResponses').split(',')
-        if post_params[1] == 1:
-            query = Q(event__name=post_params[0]) & Q(price_lt=1000)
-        elif post_params[1] == 2:
-            query = Q(event__name=post_params[0]) & Q(price_gte=1000) & Q(price_lte=5000)
-        elif post_params[1] == 3:
-            query = Q(event__name=post_params[0]) & Q(price_gt=5000)
-        else:
+
+        if post_params[1] == 'До 1000 Руб.':
+            query = Q(event__name=post_params[0]) & Q(price__lt=1000)
+        elif post_params[1] == '1000-5000 Руб.':
+            query = Q(event__name=post_params[0]) & Q(price__gte=1000) & Q(price__lte=5000)
+        elif post_params[1] == 'Свыше 5000 Руб.':
+            query = Q(event__name=post_params[0]) & Q(price__gt=5000)
+        elif post_params[1] == 'Не имеет значения':
             query = Q(event__name=post_params[0])
 
         bouquets = Bouquet.objects.filter(query)
