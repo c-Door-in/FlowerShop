@@ -1,6 +1,6 @@
 from django.forms import ModelForm, TextInput, RadioSelect
 
-from website.models import Order
+from website.models import Order, CallBack
 
 
 class OrderForm(ModelForm):
@@ -20,3 +20,10 @@ class OrderForm(ModelForm):
             'updated_at': TextInput(attrs={'type': 'hidden'}),
             'delivery_time': RadioSelect(attrs={'class': 'order__form_radio', 'name': 'orderTime', 'type': 'radio'}),
         }
+
+
+class CallBackForm(ModelForm):
+    class Meta:
+        model = CallBack
+        exclude = ['florist', 'status']
+        

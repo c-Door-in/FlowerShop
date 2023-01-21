@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'website',
     'users',
     'phonenumber_field',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -134,4 +135,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 BOT_API_KEY = env.str('BOT_API_KEY', None)
-FORIST_CHAT_ID = env.str('FORIST_CHAT_ID', None)

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block header %}
 <div class="mainBg">
@@ -98,11 +99,10 @@
 	<div class="container">
 		<div class="consultation">
 			<div class="title consultation__title">Оставьте заявку на консультацию</div>
-			<form action="{% url 'consultation_form' %}" class="consultation__form" method="post">
-				{% csrf_token %}
-				<input type="text" name="fname" class="consultation__form_input" placeholder="Введите Имя" required>
-				<input type="text" name="tel" class="consultation__form_input" placeholder="+ 7 (999) 000 00 00" required>
-				<button type="submit" class="consultation__form_btn">Отправить</button>
+			<form action="" class="consultation__form" method="post"> {% csrf_token %}
+				{{ form.client_name|add_class:"consultation__form_input"|attr:"placeholder:Введите Имя" }}
+				{{ form.phonenumber|add_class:"consultation__form_input"|attr:"placeholder:+ 7 (999) 000 00 00" }}
+				<input type="submit" class="consultation__form_btn" value="Отправить"/>
 			</form>
 		</div>
 	</div>

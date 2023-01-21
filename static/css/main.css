@@ -482,7 +482,7 @@ margin-bottom: 30px;
 	margin-top: 70px;
 }
 .quiz__progress_step {
-	text-align: center;;
+	text-align: center;
 	margin-bottom: 10px;
 }
 .quiz__progress_line {
@@ -491,7 +491,7 @@ margin-bottom: 30px;
 	height: 8px;
 	position: relative;
 }
-.quiz__progress_lineActive {;
+.quiz__progress_lineActive {
 	position: absolute;
 	background: #17CF97;
 	border-radius: 10px;

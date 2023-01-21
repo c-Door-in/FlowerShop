@@ -6,12 +6,47 @@ from telegram import Bot
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 
-from website.forms import OrderForm
-from website.models import Event, Bouquet, Order
+from users.models import User
+
+from website.forms import OrderForm, CallBackForm
+from website.models import Event, Bouquet, Order, CallBack
+
+
+def inform_florist(callback):
+    tg_chat_id = callback.florist.tg_chat_id
+    client_name = callback.client_name
+    phonenumber = callback.phonenumber
+
+    bot_api_key = settings.BOT_API_KEY
+    text = f'''
+    Запрос на обратный звонок от FlowerShop
+    Имя: {client_name}
+    Номер телефона: {phonenumber}'''
+
+    try:
+        bot = Bot(token=bot_api_key)
+        bot.send_message(text=text, chat_id=tg_chat_id)
+    except Exception as err:
+        print(err)
+        return False
+    return True
 
 
 def mainpage(request):
-    return render(request, 'index.html')
+    florist = User.objects.filter(role='FL')[0]
+    callback = CallBack(florist=florist)
+    callbackform = CallBackForm(request.POST, instance=callback)
+    context = {
+                'form': callbackform,
+            }
+    if request.method == 'POST':
+        if not callbackform.is_valid():
+            return render(request, 'consultation.html', context)
+        callbackform.save()
+        florist_informed = inform_florist(callback)
+        context['florist_informed'] = florist_informed
+        return render(request, 'consult_confirm.html', context)
+    return render(request, 'index.html', context)
 
 
 def catalog(request):
@@ -19,7 +54,19 @@ def catalog(request):
 
 
 def consultation(request):
-    return render(request, 'consultation.html')
+    florist = User.objects.filter(role='FL')[0]
+    callback = CallBack(florist=florist)
+    callbackform = CallBackForm(request.POST, instance=callback)
+    context = {
+                'form': callbackform,
+            }
+    if request.method == 'POST':
+        if callbackform.is_valid():
+            callbackform.save()
+            florist_informed = inform_florist(callback)
+            context['florist_informed'] = florist_informed
+            return render(request, 'consult_confirm.html', context)
+    return render(request, 'consultation.html', context)
 
 
 def contacts(request):
@@ -109,6 +156,7 @@ def quiz_step(request):
 
 def result(request):
     return render(request, 'result.html')
+
 
 
 def consultation_form(request):
