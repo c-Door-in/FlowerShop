@@ -41,10 +41,10 @@
 								<div class="quiz__progress_step">
 									<span class="quiz__progress_num">{{ index+1 }}</span>
 									<span class="quiz__progress_in"> шаг из </span>
-									<span class="quiz__progress_num">{{ Steps }}</span>
+									<span class="quiz__progress_num">{{ Steps+1 }}</span>
 								</div>
 								<div class="quiz__progress_line">
-									<div class="quiz__progress_lineActive" style="width: 30%"></div>
+									<div class="quiz__progress_lineActive" v-bind:style="{width: barWidth+'%'}"></div>
 								</div>
 							</div>
 
@@ -70,7 +70,7 @@
 					</div>
 					<div class="quiz__elems fic">
 						<form class="order__form">
-							<input v-model="userResponses" type="hidden" value="userResponses" name="userResponses">
+							<input v-model="userResponses" type="hidden" value="userResponse" name="userResponses">
 							{% endverbatim %}
 							<button type="submit" formmethod="post" ref="HiddenFormSubmit" formaction="{% url 'quiz' %}" class="btn order__form_btn">Подобрать букет</button>
 							{% csrf_token %}
@@ -81,11 +81,12 @@
 						<div class="quiz__progress_step">
 							<span class="quiz__progress_num">{{ Index+1 }}</span>
 							<span class="quiz__progress_in"> шаг из </span>
-							<span class="quiz__progress_num">{{ Steps }}</span>
+							<span class="quiz__progress_num">{{ Steps+1 }}</span>
 						</div>
 						<div class="quiz__progress_line">
 							<div class="quiz__progress_lineActive" style="width: 100%"></div>
 						</div>
+
 					</div>
 
 				</div>
@@ -121,7 +122,10 @@
 
             Index: 0,
 
+			value: 40,
+			max: 100,
 
+			barWidth: 1,
 
 
             quiz: {
@@ -149,7 +153,7 @@
             	]
             },
 
-			Steps: 3,
+			Steps: 2,
             userResponses: ["",""]
 
         }
@@ -163,9 +167,11 @@
         },
         Next() {
         	this.Index++
+        	this.barWidth += 100/this.Steps
         },
         Prev() {
         	this.Index--
+        	this.barWidth -= 100/this.Steps
         },
         Progress(value) {
         	return value*100/Steps

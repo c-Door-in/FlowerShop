@@ -10,7 +10,16 @@
 					<div class="title">Оформление доставки</div>
 					<form action="{% url 'order_step' %}" class="order__form" method="post">
 						{% csrf_token %}
-						{{ order_form.errors }}
+						{% if order_form.errors %}
+						   {% for field in order_form %}
+							   {% for error in field.errors %}
+								  <div class="error-msg">
+									   <strong><i class="fa fa-times-circle"></i> {{ error|escape }}</strong>
+								  </div>
+							   {% endfor %}
+						   {% endfor %}
+						{% endif %}
+
 						<div class="order__form_block ficb">
 							{{ order_form.client_name }}
 							{{ order_form.phonenumber}}
