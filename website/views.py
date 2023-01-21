@@ -42,7 +42,8 @@ def mainpage(request):
         if not callbackform.is_valid():
             return render(request, 'consultation.html', context)
         callbackform.save()
-        inform_florist(callback)
+        florist_informed = inform_florist(callback)
+        context['florist_informed'] = florist_informed
         return render(request, 'consult_confirm.html', context)
     return render(request, 'index.html', context)
 
@@ -61,7 +62,8 @@ def consultation(request):
     if request.method == 'POST':
         if callbackform.is_valid():
             callbackform.save()
-            inform_florist(callback)
+            florist_informed = inform_florist(callback)
+            context['florist_informed'] = florist_informed
             return render(request, 'consult_confirm.html', context)
     return render(request, 'consultation.html', context)
 

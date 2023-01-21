@@ -10,7 +10,13 @@
 				<span class="quiz__back_intro">Назад</span></a>
 			</div>
 			<div class="quiz__block">
-				<h1 class="title">Отлично, скоро с вами свяжемся</h1>
+				<h1 class="title">
+					{% if florist_informed %}
+						Отлично, скоро с вами свяжемся
+					{% else %}
+						К сожалению, флорист сейчас недоступен
+					{% endif %}
+				</h1>
 				<span class="card__elems_intro">А пока можете присмотреть что-нибудь из готовой коллекции</span>
 			</div>
 			
