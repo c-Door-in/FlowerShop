@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'users',
     'phonenumber_field',
     'widget_tweaks',
+    'statistic',
+    'utm.apps.UtmConfig',
 ]
 
 MIDDLEWARE = [

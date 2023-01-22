@@ -6,6 +6,7 @@ from django.conf import settings
 from django.shortcuts import render
 
 from users.models import User
+from utm.views import check_utm
 
 from website.forms import OrderForm, CallBackForm
 from website.models import Event, Bouquet, Order, CallBack
@@ -32,6 +33,9 @@ def inform_florist(callback):
 
 
 def mainpage(request):
+
+    check_utm(request)
+
     florist = User.objects.filter(role='FL')[0]
     callback = CallBack(florist=florist)
     callbackform = CallBackForm(request.POST, instance=callback)
