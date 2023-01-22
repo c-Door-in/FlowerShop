@@ -190,7 +190,7 @@ def order_step(request, pk):
                 },
                 "confirmation": {
                     "type": "redirect",
-                    "return_url": reverse('confirm_pay', kwargs={'pk': pk})
+                    "return_url": request.build_absolute_uri(reverse('confirm_pay', kwargs={'pk': pk}))
                 },
                 "description": form.order
             }
