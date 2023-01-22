@@ -6,7 +6,6 @@ from django.urls import reverse
 from telegram import Bot
 
 from django.conf import settings
-from django.shortcuts import render
 from django.views.generic.detail import DetailView
 from django.shortcuts import render, get_object_or_404
 from yookassa import Payment
@@ -19,11 +18,6 @@ from website.models import Event, Bouquet, Order, CallBack, PaymentOrder
 
 
 def send_tg_message(text, tg_chat_id):
-def inform_florist(callback):
-    tg_chat_id = callback.florist.tg_chat_id
-    client_name = callback.client_name
-    phonenumber = callback.phonenumber
-
     bot_api_key = settings.BOT_API_KEY
     try:
         bot = Bot(token=bot_api_key)
@@ -40,9 +34,9 @@ def inform_florist(callback):
     phonenumber = callback.phonenumber
 
     text = f'''
-    Запрос на обратный звонок от FlowerShop
-    Имя: {client_name}
-    Номер телефона: {phonenumber}'''
+        Запрос на обратный звонок от FlowerShop
+        Имя: {client_name}
+        Номер телефона: {phonenumber}'''
 
     return send_tg_message(text, florist_tg_chat_id)
 
@@ -58,13 +52,13 @@ def inform_courier(delivery):
     created_at = delivery.order.created_at
 
     text = f'''
-    Заказ на доставку от FlowerShop
-    Букет: {bouquet}
-    Имя: {client_name}
-    Адрес: {address}
-    Номер телефона: {phonenumber}
-    Ожидаемое время доставки: {delivery_time}
-    Принят: {created_at}'''
+        Заказ на доставку от FlowerShop
+        Букет: {bouquet}
+        Имя: {client_name}
+        Адрес: {address}
+        Номер телефона: {phonenumber}
+        Ожидаемое время доставки: {delivery_time}
+        Принят: {created_at}'''
 
     return send_tg_message(text, courier_tg_chat_id)
 
@@ -83,9 +77,7 @@ def get_bouquets_catalog(bouquets):
     return catalog
 
 
-
 def mainpage(request):
-
     check_utm(request)
 
     bouquets = Bouquet.objects.all().order_by('?')
