@@ -241,14 +241,6 @@ def quiz(request):
     return render(request, 'quiz.html', context)
 
 
-def quiz_step(request):
-    return render(request, 'quiz-step.html')
-
-
-def result(request):
-    return render(request, 'result.html')
-
-
 def consultation_form(request):
     user_name = request.POST.get('fname')
     user_phone = request.POST.get('tel')
@@ -284,4 +276,4 @@ def confirm_pay(request, pk):
     if response.status == 'succeeded':
         payment.status = PaymentOrder.SUCCESS
         payment.save()
-    return render(request, 'compete_payment.html')
+    return render(request, 'complete_payment.html')
