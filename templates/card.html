@@ -28,7 +28,7 @@
 						</span>
 					</div>
 				</div>
-				<form action="{% url 'order' %}">
+				<form action="{% url 'order' bouquet.pk %}">
 					<input type="hidden" value="{{ bouquet.pk }}" name="BouquetOrder">
 					<button class="btn largeBtn card__btn" type="submit">Заказать букет</button>
 				</form>

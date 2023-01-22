@@ -5,7 +5,18 @@
 <section id="payment_complete">
 	<div class="container">
 		<div class="contacts">
-			<div class="title">Платеж принят. Дождитесь звонка оператора</div>
+			<div class="title">
+				{% if payment_succeeded %}
+					Платеж принят. 
+						{% if courier_informed %}
+						Дождитесь звонка оператора
+						{% else %}
+						Но оператор не получил сообщения. Свяжитесь с нами
+						{% endif %}
+				{% else %}
+					Ошибка оплаты. Попробуйте еще раз
+				{% endif %}
+			</div>
 			<a href="{% url 'mainpage' %}" class="btn banner__btn">На главную</a>
 		</div>
 	</div>

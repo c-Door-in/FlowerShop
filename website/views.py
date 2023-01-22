@@ -14,18 +14,14 @@ from users.models import User
 from utm.views import check_utm
 
 from website.forms import OrderForm, CallBackForm, PaymentForm
-from website.models import Event, Bouquet, Order, CallBack, PaymentOrder
+from website.models import Event, Bouquet, Order, CallBack, PaymentOrder, Delivery
 
 
 def send_tg_message(text, tg_chat_id):
     bot_api_key = settings.BOT_API_KEY
-    try:
-        bot = Bot(token=bot_api_key)
-        bot.send_message(text=text, chat_id=tg_chat_id)
-    except Exception as err:
-        print(err)
-        return False
-    return True
+    bot = Bot(token=bot_api_key)
+    bot.send_message(text=text, chat_id=tg_chat_id)
+    return
 
 
 def inform_florist(callback):
@@ -38,29 +34,31 @@ def inform_florist(callback):
         Имя: {client_name}
         Номер телефона: {phonenumber}'''
 
-    return send_tg_message(text, florist_tg_chat_id)
+    send_tg_message(text, florist_tg_chat_id)
+    return
 
 
 def inform_courier(delivery):
     courier_tg_chat_id = delivery.courier.tg_chat_id
 
-    bouquet = bouquet
+    bouquet = delivery.order.bouquet
+    price = bouquet.price
     client_name = delivery.order.client_name
     address = delivery.order.address
     phonenumber = delivery.order.phonenumber
-    delivery_time = delivery.order.delivery_time
-    created_at = delivery.order.created_at
+    delivery_time = delivery.order.get_delivery_time_display()
 
     text = f'''
         Заказ на доставку от FlowerShop
         Букет: {bouquet}
+        Стоимость: {price}
         Имя: {client_name}
         Адрес: {address}
         Номер телефона: {phonenumber}
-        Ожидаемое время доставки: {delivery_time}
-        Принят: {created_at}'''
+        Ожидаемое время доставки: {delivery_time}'''
 
-    return send_tg_message(text, courier_tg_chat_id)
+    send_tg_message(text, courier_tg_chat_id)
+    return
 
 
 def get_bouquets_catalog(bouquets):
@@ -96,8 +94,14 @@ def mainpage(request):
         if not callbackform.is_valid():
             return render(request, 'consultation.html', context)
         callbackform.save()
-        florist_informed = inform_florist(callback)
-        context['florist_informed'] = florist_informed
+
+        try:
+            inform_florist(callback)
+            context['florist_informed'] = True
+        except Exception as err:
+            print(err)
+            context['florist_informed'] = False
+
         return render(request, 'consult_confirm.html', context)
 
     return render(request, 'index.html', context)
@@ -273,9 +277,24 @@ def confirm_pay(request, pk):
         },
         idempotence_key
     )
-
+    context = {
+        'payment_succeeded': False,
+    }
     if response.status == 'succeeded':
         payment.status = PaymentOrder.SUCCESS
         order_obj.order_status = Order.PAYED
         payment.save()
-    return render(request, 'complete_payment.html')
+        context['payment_succeeded'] = True
+        courier = User.objects.filter(role='CR', is_worked=True).order_by('?').first()
+        delivery = Delivery.objects.create(
+            order=order_obj,
+            courier=courier,
+        )
+        try:
+            inform_courier(delivery)
+            context['courier_informed'] = True
+        except Exception as err:
+            print(err)
+            context['courier_informed'] = False
+
+    return render(request, 'complete_payment.html', context)
