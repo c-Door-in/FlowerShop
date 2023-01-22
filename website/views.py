@@ -6,26 +6,25 @@ from django.urls import reverse
 from telegram import Bot
 
 from django.conf import settings
+from django.shortcuts import render
+from django.views.generic.detail import DetailView
 from django.shortcuts import render, get_object_or_404
 from yookassa import Payment
 
 from users.models import User
+from utm.views import check_utm
 
 from website.forms import OrderForm, CallBackForm, PaymentForm
 from website.models import Event, Bouquet, Order, CallBack, PaymentOrder
 
 
+def send_tg_message(text, tg_chat_id):
 def inform_florist(callback):
     tg_chat_id = callback.florist.tg_chat_id
     client_name = callback.client_name
     phonenumber = callback.phonenumber
 
     bot_api_key = settings.BOT_API_KEY
-    text = f'''
-    Запрос на обратный звонок от FlowerShop
-    Имя: {client_name}
-    Номер телефона: {phonenumber}'''
-
     try:
         bot = Bot(token=bot_api_key)
         bot.send_message(text=text, chat_id=tg_chat_id)
@@ -35,13 +34,72 @@ def inform_florist(callback):
     return True
 
 
+def inform_florist(callback):
+    florist_tg_chat_id = callback.florist.tg_chat_id
+    client_name = callback.client_name
+    phonenumber = callback.phonenumber
+
+    text = f'''
+    Запрос на обратный звонок от FlowerShop
+    Имя: {client_name}
+    Номер телефона: {phonenumber}'''
+
+    return send_tg_message(text, florist_tg_chat_id)
+
+
+def inform_courier(delivery):
+    courier_tg_chat_id = delivery.courier.tg_chat_id
+
+    bouquet = bouquet
+    client_name = delivery.order.client_name
+    address = delivery.order.address
+    phonenumber = delivery.order.phonenumber
+    delivery_time = delivery.order.delivery_time
+    created_at = delivery.order.created_at
+
+    text = f'''
+    Заказ на доставку от FlowerShop
+    Букет: {bouquet}
+    Имя: {client_name}
+    Адрес: {address}
+    Номер телефона: {phonenumber}
+    Ожидаемое время доставки: {delivery_time}
+    Принят: {created_at}'''
+
+    return send_tg_message(text, courier_tg_chat_id)
+
+
+def get_bouquets_catalog(bouquets):
+    catalog = []
+    catalog_line = []
+
+    for index, bouquet in enumerate(bouquets):
+        if index and index % 3 == 0:
+            catalog.append(catalog_line)
+            catalog_line = []
+        catalog_line.append(bouquet)
+    catalog.append(catalog_line)
+
+    return catalog
+
+
+
 def mainpage(request):
+
+    check_utm(request)
+
+    bouquets = Bouquet.objects.all().order_by('?')
     florist = User.objects.filter(role='FL')[0]
     callback = CallBack(florist=florist)
+
+    catalog = get_bouquets_catalog(bouquets)
+    first_line_bouquets = catalog[0]
+
     callbackform = CallBackForm(request.POST, instance=callback)
     context = {
-                'form': callbackform,
-            }
+        'catalog_line': first_line_bouquets,
+        'form': callbackform,
+    }
     if request.method == 'POST':
         if not callbackform.is_valid():
             return render(request, 'consultation.html', context)
@@ -49,11 +107,18 @@ def mainpage(request):
         florist_informed = inform_florist(callback)
         context['florist_informed'] = florist_informed
         return render(request, 'consult_confirm.html', context)
+
     return render(request, 'index.html', context)
 
 
 def catalog(request):
-    return render(request, 'catalog.html')
+    bouquets = Bouquet.objects.all()
+    catalog = get_bouquets_catalog(bouquets)
+    context = {
+        'catalog': catalog
+    }
+
+    return render(request, 'catalog.html', context)
 
 
 def consultation(request):
@@ -61,8 +126,8 @@ def consultation(request):
     callback = CallBack(florist=florist)
     callbackform = CallBackForm(request.POST, instance=callback)
     context = {
-                'form': callbackform,
-            }
+        'form': callbackform,
+    }
     if request.method == 'POST':
         if callbackform.is_valid():
             callbackform.save()
@@ -72,12 +137,14 @@ def consultation(request):
     return render(request, 'consultation.html', context)
 
 
-def contacts(request):
-    return render(request, 'index.html')
+class CardView(DetailView):
+    model = Bouquet
+    template_name = 'card.html'
 
-
-def card(request):
-    return render(request, 'card.html')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CallBackForm()
+        return context
 
 
 def order(request, pk):

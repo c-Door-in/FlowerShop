@@ -164,6 +164,7 @@ bottom: 0;
 	height: 57px;
 }
 .recommended__block {
+	position: relative;
 	display: flex;
     align-items: end;
 	width: 398px;
@@ -185,6 +186,8 @@ bottom: 0;
 .recommended__block_elems {
 	width: 100%;
 	padding: 15px;
+	position: absolute;
+    bottom: 8px;
 }
 .recommended__btn {
 	width: 100%;
