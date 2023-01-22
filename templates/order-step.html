@@ -25,12 +25,37 @@
 							<div class="order__form_items">
 								<div class="order__form_intro">номер карты</div>
 								{{ payment_form.card_number }}
+								{% if payment_form.card_number.errors %}
+								<div class="error-msg">
+									   <strong><i class="fa fa-times-circle"></i> {{ payment_form.card_number.errors }}</strong>
+								</div>
+								{% endif %}
 								<div class="order__form_item fic">
 									{{ payment_form.card_month }}
+									{% if payment_form.card_month.errors %}
+									<div class="error-msg">
+										   <strong><i class="fa fa-times-circle"></i> {{ payment_form.card_month.errors }}</strong>
+									</div>
+									{% endif %}
 									{{ payment_form.card_year }}
+									{% if payment_form.card_year.errors %}
+									<div class="error-msg">
+										   <strong><i class="fa fa-times-circle"></i> {{ payment_form.card_year.errors }}</strong>
+									</div>
+									{% endif %}
 								</div>
 								{{ payment_form.card_holder }}
+								{% if payment_form.card_holder.errors %}
+								<div class="error-msg">
+									   <strong><i class="fa fa-times-circle"></i> {{ payment_form.card_holder.errors }}</strong>
+								</div>
+								{% endif %}
 								{{ payment_form.card_cvc }}
+								{% if payment_form.card_cvc.errors %}
+								<div class="error-msg">
+									   <strong><i class="fa fa-times-circle"></i> {{ payment_form.card_cvc.errors }}</strong>
+								</div>
+								{% endif %}
 							</div>
 							<div class="order__form_items">
 								<div class="order__form_intro">Ваш e-mail (необязательно)</div>
