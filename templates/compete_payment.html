@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section id="payment_complete">
+	<div class="container">
+		<div class="contacts">
+			<div class="title">Платеж принят. Дождитесь звонка оператора</div>
+			<a href="{% url 'mainpage' %}" class="btn banner__btn">На главную</a>
+		</div>
+	</div>
+</section>
+{% endblock %}

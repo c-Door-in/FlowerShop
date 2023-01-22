@@ -8,3 +8,6 @@ Pillow==9.4.0
 python-telegram-bot==13.15
 django-phonenumber-field==7.0.2
 phonenumbers==8.13.4
+yookassa==2.3.3
+django-widget-tweaks==1.4.12
+Django~=4.1.5

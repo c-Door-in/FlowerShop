@@ -34,7 +34,7 @@
 					<div class="result__items">
 						<div class="title result__items_title">{{ bouquet.name }}</div>
 						<div class="result__items_price">{{ bouquet.price }} руб</div>
-						<form action="{% url 'order' %}">
+						<form action="{% url 'order' bouquet.pk %}">
 							<input type="hidden" value="{{ bouquet.pk }}" name="BouquetOrder">
 							<button class="btn result__items_btn" type="submit">Заказать букет</button>
 						</form>
