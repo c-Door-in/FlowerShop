@@ -4,6 +4,7 @@ from telegram import Bot
 
 from django.conf import settings
 from django.shortcuts import render
+from django.views.generic.detail import DetailView
 
 from users.models import User
 from utm.views import check_utm
@@ -32,16 +33,37 @@ def inform_florist(callback):
     return True
 
 
-def mainpage(request):
+def get_bouquets_catalog(bouquets):
+    catalog = []
+    catalog_line = []
+    
+    for index, bouquet in enumerate(bouquets):
+        if index and index % 3 == 0:
+            catalog.append(catalog_line)
+            catalog_line = []
+        catalog_line.append(bouquet)
+    catalog.append(catalog_line)
 
+    return catalog
+
+    
+
+def mainpage(request):
+    
     check_utm(request)
 
+    bouquets = Bouquet.objects.all().order_by('?')
     florist = User.objects.filter(role='FL')[0]
     callback = CallBack(florist=florist)
+
+    catalog = get_bouquets_catalog(bouquets)
+    first_line_bouquets = catalog[0]
+
     callbackform = CallBackForm(request.POST, instance=callback)
     context = {
-                'form': callbackform,
-            }
+        'catalog_line': first_line_bouquets,
+        'form': callbackform,
+    }
     if request.method == 'POST':
         if not callbackform.is_valid():
             return render(request, 'consultation.html', context)
@@ -49,11 +71,18 @@ def mainpage(request):
         florist_informed = inform_florist(callback)
         context['florist_informed'] = florist_informed
         return render(request, 'consult_confirm.html', context)
+
     return render(request, 'index.html', context)
 
 
 def catalog(request):
-    return render(request, 'catalog.html')
+    bouquets = Bouquet.objects.all()
+    catalog = get_bouquets_catalog(bouquets)
+    context = {
+        'catalog': catalog
+    }
+
+    return render(request, 'catalog.html', context)
 
 
 def consultation(request):
@@ -61,8 +90,8 @@ def consultation(request):
     callback = CallBack(florist=florist)
     callbackform = CallBackForm(request.POST, instance=callback)
     context = {
-                'form': callbackform,
-            }
+        'form': callbackform,
+    }
     if request.method == 'POST':
         if callbackform.is_valid():
             callbackform.save()
@@ -76,8 +105,14 @@ def contacts(request):
     return render(request, 'index.html')
 
 
-def card(request):
-    return render(request, 'card.html')
+class CardView(DetailView):
+    model = Bouquet
+    template_name = 'card.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CallBackForm()
+        return context
 
 
 def order(request):
