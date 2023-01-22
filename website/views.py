@@ -127,10 +127,6 @@ def consultation(request):
     return render(request, 'consultation.html', context)
 
 
-def contacts(request):
-    return render(request, 'index.html')
-
-
 class CardView(DetailView):
     model = Bouquet
     template_name = 'card.html'
