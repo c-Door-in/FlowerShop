@@ -195,6 +195,7 @@ def order_step(request, pk):
                 "description": form.order
             }
             payment = Payment.create(payment_payload)
+
             payment_confirmation = payment.confirmation.confirmation_url
             payment_id = payment.id
             form.payment_id = payment_id
@@ -275,5 +276,6 @@ def confirm_pay(request, pk):
 
     if response.status == 'succeeded':
         payment.status = PaymentOrder.SUCCESS
+        order_obj.order_status = Order.PAYED
         payment.save()
     return render(request, 'complete_payment.html')
