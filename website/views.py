@@ -13,17 +13,8 @@ from website.forms import OrderForm, CallBackForm
 from website.models import Event, Bouquet, Order, CallBack
 
 
-def inform_florist(callback):
-    tg_chat_id = callback.florist.tg_chat_id
-    client_name = callback.client_name
-    phonenumber = callback.phonenumber
-    
+def send_tg_message(text, tg_chat_id):
     bot_api_key = settings.BOT_API_KEY
-    text = f'''
-    Запрос на обратный звонок от FlowerShop
-    Имя: {client_name}
-    Номер телефона: {phonenumber}'''
-
     try:
         bot = Bot(token=bot_api_key)
         bot.send_message(text=text, chat_id=tg_chat_id)
@@ -33,10 +24,45 @@ def inform_florist(callback):
     return True
 
 
+def inform_florist(callback):
+    florist_tg_chat_id = callback.florist.tg_chat_id
+    client_name = callback.client_name
+    phonenumber = callback.phonenumber
+    
+    text = f'''
+    Запрос на обратный звонок от FlowerShop
+    Имя: {client_name}
+    Номер телефона: {phonenumber}'''
+
+    return send_tg_message(text, florist_tg_chat_id)
+
+
+def inform_courier(delivery):
+    courier_tg_chat_id = delivery.courier.tg_chat_id
+
+    bouquet = bouquet
+    client_name = delivery.order.client_name
+    address = delivery.order.address
+    phonenumber = delivery.order.phonenumber
+    delivery_time = delivery.order.delivery_time
+    created_at = delivery.order.created_at
+    
+    text = f'''
+    Заказ на доставку от FlowerShop
+    Букет: {bouquet}
+    Имя: {client_name}
+    Адрес: {address}
+    Номер телефона: {phonenumber}
+    Ожидаемое время доставки: {delivery_time}
+    Принят: {created_at}'''
+
+    return send_tg_message(text, courier_tg_chat_id)
+
+
 def get_bouquets_catalog(bouquets):
     catalog = []
     catalog_line = []
-    
+
     for index, bouquet in enumerate(bouquets):
         if index and index % 3 == 0:
             catalog.append(catalog_line)
