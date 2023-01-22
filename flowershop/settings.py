@@ -6,6 +6,7 @@ import os
 from environs import Env
 from pathlib import Path
 
+from yookassa import Configuration
 
 env = Env()
 env.read_env()
@@ -135,3 +136,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 BOT_API_KEY = env.str('BOT_API_KEY', None)
+FORIST_CHAT_ID = env.str('FORIST_CHAT_ID', None)
+YOOMONEY_KEY = env.str('YOOMONEY_KEY')
+YOOMONEY_ID = env('YOOMONEY_ID')
+
+Configuration.account_id = YOOMONEY_ID
+Configuration.secret_key = YOOMONEY_KEY

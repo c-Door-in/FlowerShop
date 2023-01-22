@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from website.models import Event, Bouquet, Order, CallBack, Delivery, Payment
+from website.models import Event, Bouquet, Order, CallBack, Delivery, PaymentOrder
 
 
 @admin.register(Event)
@@ -27,6 +27,7 @@ class CallBackAdmin(admin.ModelAdmin):
 class DeliveryAdmin(admin.ModelAdmin):
     list_display = ['order', 'status']
 
-@admin.register(Payment)
+
+@admin.register(PaymentOrder)
 class PaymentAdmin(admin.ModelAdmin):
     list_display = ['id', 'order', 'status']

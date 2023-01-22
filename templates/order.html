@@ -8,7 +8,7 @@
 			<div class="order__block">
 				<div class="order_items">
 					<div class="title">Оформление доставки</div>
-					<form action="{% url 'order' %}" class="order__form" method="post">
+					<form action="{% url 'order' bouquet.pk %}" class="order__form" method="post">
 						{% csrf_token %}
 						{% if order_form.errors %}
 						   {% for field in order_form %}

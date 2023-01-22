@@ -1,6 +1,6 @@
-from django.forms import ModelForm, TextInput, RadioSelect
+from django.forms import ModelForm, TextInput, RadioSelect, CharField, IntegerField, EmailField
 
-from website.models import Order, CallBack
+from website.models import Order, CallBack, PaymentOrder
 
 
 class OrderForm(ModelForm):
@@ -26,4 +26,21 @@ class CallBackForm(ModelForm):
     class Meta:
         model = CallBack
         exclude = ['florist', 'status']
-        
+
+
+class PaymentForm(ModelForm):
+    card_number = CharField(widget=TextInput(attrs={'placeholder': 'Введите номер'}))
+    card_month = CharField(widget=TextInput(attrs={'placeholder': 'ММ'}))
+    card_year = CharField(widget=TextInput(attrs={'placeholder': 'ГГ'}))
+    card_holder = CharField(widget=TextInput(attrs={'placeholder': 'Имя владельца'}))
+    card_cvc = CharField(widget=TextInput(attrs={'placeholder': 'CVC'}))
+    email = EmailField(widget=TextInput(attrs={'placeholder': 'pochta@mail.ru'}), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'order__form_input orderStep_form_input'
+
+    class Meta:
+        model = PaymentOrder
+        fields = ['card_number', 'card_month', 'card_year', 'card_holder', 'card_cvc', 'email']
