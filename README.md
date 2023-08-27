@@ -52,4 +52,4 @@ pyhon manage.py runserver
 ```
 
 ## Цели проекта
-Проект создан в учебных целях для портала [Devman](https://devman.org)
+Проект создан по заказу портала [Devman](https://devman.org)
